@@ -17,14 +17,22 @@ class ContactsView(APIView):
             serializer = ContactSerializer(contacts, many=True)
             return Response(serializer.data)
         
-    def post(self, request):
+    def post(self, request, contact_id=None):
+        
+        if contact_id is not None:
+            contact = Contact.objects.filter(id=contact_id)
+            data =request.data
+            contact.update(first_name=data['first_name'],last_name=data['last_name'],email=data['email'],address=data['address'], phone=data['phone'])
+            return Response( status=status.HTTP_200_OK)
             
-        serializer = ContactSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+            serializer = ContactSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             
         
     def delete(self, request, contact_id):
@@ -34,3 +42,28 @@ class ContactsView(APIView):
         
         return Response(status=status.HTTP_204_NO_CONTENT)
         
+
+
+
+
+
+
+# def post(self, request):
+            
+#         serializer = ContactSerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data, status=status.HTTP_200_OK)
+#         else:
+#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+    
+    
+            
+#     def put(self, request, contact_id):
+#         contact = Contact.objects.get(id=contact_id)
+#         serializer = ContactSerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)    
